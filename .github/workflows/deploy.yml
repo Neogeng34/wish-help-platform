@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
   build-and-deploy:
@@ -30,9 +31,24 @@ jobs:
           npm run build
         env:
           NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
+          NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: ${{ secrets.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY }}
+          NEXT_PUBLIC_AUTH_DOMAIN: ${{ secrets.NEXT_PUBLIC_AUTH_DOMAIN }}
+          NEXT_PUBLIC_AUTH_CLIENT_ID: ${{ secrets.NEXT_PUBLIC_AUTH_CLIENT_ID }}
 
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           folder: frontend/out
-          branch: gh-pages 
+          branch: gh-pages
+          clean: true
+
+      - name: Create CNAME
+        run: |
+          echo "wish-help-platform.com" > frontend/out/CNAME
+
+      - name: Deploy CNAME
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: frontend/out
+          branch: gh-pages
+          clean: false 
